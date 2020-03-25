@@ -3,7 +3,7 @@ import sys
 
 with open(sys.argv[1]) as f, open(sys.argv[2], 'w') as fout:
     writer = csv.writer(fout)
-    writer.writerow(['chrom', 'pos', 'ref', 'snp', 'indel', 'snp_indel', 'non_mut', 'null'])
+    writer.writerow(['chrom', 'pos', 'ref', 'snp', 'indel', 'heterozygous', 'non_mut', 'null'])
 
     for line in f:
         if line.startswith('#'):
@@ -17,7 +17,7 @@ with open(sys.argv[1]) as f, open(sys.argv[2], 'w') as fout:
         fields = line[8].split(':')
         samples = line[9:]
 
-        counts = {call_type: 0 for call_type in ['snp', 'indel', 'snp_indel', 'non_mut', 'null']}
+        counts = {call_type: 0 for call_type in ['snp', 'indel', 'heterozygous', 'non_mut', 'null']}
 
         for sample in samples:
             sample = sample.split(':')
@@ -45,11 +45,11 @@ with open(sys.argv[1]) as f, open(sys.argv[2], 'w') as fout:
                     if alleles[0] == alleles[1]:
                         call_type = alleles[0]
                     else:
-                        call_type = 'snp_indel'
+                        call_type = 'heterozygous'
             except ValueError:
                 call_type = 'null'
 
             counts[call_type] += 1
 
-        writer.writerow([chrom, pos, ref, counts['snp'], counts['indel'], counts['snp_indel'], counts['non_mut'],
+        writer.writerow([chrom, pos, ref, counts['snp'], counts['indel'], counts['heterozygous'], counts['non_mut'],
                          counts['null']])
