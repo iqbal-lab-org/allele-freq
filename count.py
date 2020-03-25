@@ -35,17 +35,15 @@ with open(sys.argv[1]) as f, open(sys.argv[2], 'w') as fout:
 
                 if call_value[0] == call_value[1] == 0:
                     call_type = 'non_mut'
+                elif call_value[0] != 0 and call_value[1] != 0:
+                    call_type = 'heterozygous'
                 else:
-                    alleles = [alts[call_value[0] - 1], alts[call_value[1] - 1]]
-
-                    for i, allele in enumerate(alleles):
-                        if len(allele) > 1:
-                            alleles[i] = 'indel'
-
-                    if alleles[0] == alleles[1]:
-                        call_type = alleles[0]
+                    mutated_value = call_value[0] if call_value[0] != 0 else call_value[1]
+                    mutated_allele = alts[mutated_value - 1]
+                    if len(mutated_allele) == 1:
+                        call_type = 'snp'
                     else:
-                        call_type = 'heterozygous'
+                        call_type = 'indel'
             except ValueError:
                 call_type = 'null'
 
