@@ -41,7 +41,7 @@ with open(sys.argv[1]) as f, open(sys.argv[2], 'w') as fout:
                     mutated_value = call_value[0] if call_value[0] != 0 else call_value[1]
                     mutated_allele = alts[mutated_value - 1]
                     if len(mutated_allele) == 1:
-                        call_type = 'snp'
+                        call_type = mutated_allele
                     else:
                         call_type = 'indel'
             except ValueError:
