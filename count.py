@@ -7,7 +7,7 @@ VARIANTS = list(Variant)
 
 with open(sys.argv[1]) as f, open(sys.argv[2], 'w') as fout:
     writer = csv.writer(fout)
-    writer.writerow(['chrom', 'pos', 'ref'] + Variant.values())
+    writer.writerow(['chrom', 'pos', 'ref', 'atl'] + Variant.values())
 
     for line in f:
         if line.startswith('#'):
@@ -38,7 +38,7 @@ with open(sys.argv[1]) as f, open(sys.argv[2], 'w') as fout:
 
                 if call_value[0] == call_value[1] == 0:
                     call_type = Variant.NON_MUT
-                elif call_value[0] != 0 and call_value[1] != 0:
+                elif call_value[0] != call_value[1] and call_value[0] != 0 and call_value[1] != 0:
                     call_type = Variant.HET
                 else:
                     mutated_value = call_value[0] if call_value[0] != 0 else call_value[1]
@@ -54,4 +54,4 @@ with open(sys.argv[1]) as f, open(sys.argv[2], 'w') as fout:
 
             counts[call_type] += 1
 
-        writer.writerow([chrom, pos, ref] + [counts[key] for key in VARIANTS])
+        writer.writerow([chrom, pos, ref, ','.join(alts)] + [counts[key] for key in VARIANTS])
