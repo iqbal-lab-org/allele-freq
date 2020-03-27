@@ -1,12 +1,15 @@
 import sys
 from collections import Counter
 
-with open(sys.argv[1]) as f:
+
+def dominant_snp_freq(f):
+    print('chrom', 'pos', 'freq1', 'freq2', sep='\t')
+
     for line in f:
         if line.startswith('#'):
             continue
 
-        line = line.split('\t')
+        line = line.rstrip().split('\t')
         chrom = line[0]
         pos = line[1]
         ref = line[3]
@@ -17,6 +20,8 @@ with open(sys.argv[1]) as f:
         if len(ref) > 1 or any([len(alt) > 1 for alt in alts]):
             continue
 
+        bases = [ref] + alts
+
         counts = Counter()
 
         for sample in samples:
@@ -26,13 +31,18 @@ with open(sys.argv[1]) as f:
             if filters != 'PASS':
                 continue
 
-            # Both alleles' call values should be the same since Clockwork does not produce heterozygous calls
-            call_value = sample[fields.index('GT')].split('/')[0]
+            call_value = sample[fields.index('GT')].split('/')
 
             try:
-                call_value = int(call_value)
-                alt = alts[call_value - 1]
-                counts[alt] += 1
+                call_value = [int(v) for v in call_value]
+
+                if call_value[0] != call_value[1]:
+                    # Heterozygous
+                    continue
+
+                base_values = [bases[v] for v in set(call_value)]
+                for base in base_values:
+                    counts[base] += 1
 
             except ValueError:
                 # call_value == .
@@ -46,4 +56,9 @@ with open(sys.argv[1]) as f:
         else:
             a1, a2 = (x[1] for x in counts.most_common(2))
 
-        print(chrom, pos, a1/len(samples), a2/len(samples))
+        print(chrom, pos, a1/len(samples), a2/len(samples), sep='\t')
+
+
+if __name__ == '__main__':
+    with open(sys.argv[1]) as f:
+        dominant_snp_freq(f)
