@@ -14,6 +14,9 @@ with open(sys.argv[1]) as f:
         fields = line[8].split(':')
         samples = line[9:]
 
+        if len(ref) > 1 or any([len(alt) > 1 for alt in alts]):
+            continue
+
         counts = Counter()
 
         for sample in samples:
@@ -28,13 +31,8 @@ with open(sys.argv[1]) as f:
 
             try:
                 call_value = int(call_value)
-
-                if call_value == 0:
-                    continue
-                else:
-                    alt = alts[call_value - 1]
-                    if len(alt) == 1:
-                        counts[alt] += 1
+                alt = alts[call_value - 1]
+                counts[alt] += 1
 
             except ValueError:
                 # call_value == .
